@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Beautiful To-Do List with Theme Toggle</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 20px;
+        transition: background-color 0.3s, color 0.3s;
+      }
+      body.dark-theme {
+        background-color: #1e1e1e;
+        color: #ffffff;
+      }
+      body.light-theme {
+        background-color: #f0f0f0;
+        color: #000000;
+      }
+      .container {
+        display: flex;
+        flex-direction: column;
+        max-width: 1200px;
+        margin: 0 auto;
+      }
+      .columns {
+        display: flex;
+        justify-content: space-between;
+      }
+      .column {
+        flex: 1;
+        border-radius: 10px;
+        padding: 20px;
+        margin: 0 10px;
+        transition: background-color 0.3s;
+      }
+      .dark-theme .column {
+        background-color: #2d2d2d;
+      }
+      .light-theme .column {
+        background-color: #ffffff;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+      }
+      h2 {
+        text-align: center;
+      }
+      .dark-theme h2 {
+        color: #bb86fc;
+      }
+      .light-theme h2 {
+        color: #6200ee;
+      }
+      ul {
+        list-style-type: none;
+        padding: 0;
+      }
+      li {
+        margin: 10px 0;
+        padding: 10px;
+        border-radius: 5px;
+        transition: background-color 0.3s;
+      }
+      .dark-theme li {
+        background-color: #3d3d3d;
+      }
+      .light-theme li {
+        background-color: #f5f5f5;
+      }
+      input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        margin-bottom: 10px;
+        border: none;
+        border-radius: 5px;
+        transition: background-color 0.3s, color 0.3s;
+      }
+      .dark-theme input[type="text"] {
+        background-color: #4d4d4d;
+        color: #ffffff;
+      }
+      .light-theme input[type="text"] {
+        background-color: #e0e0e0;
+        color: #000000;
+      }
+      button {
+        border: none;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        transition: background-color 0.3s, color 0.3s;
+      }
+      .dark-theme button {
+        background-color: #bb86fc;
+        color: #000000;
+      }
+      .light-theme button {
+        background-color: #6200ee;
+        color: #ffffff;
+      }
+      button:hover {
+        opacity: 0.8;
+      }
+      .theme-toggle {
+        margin-bottom: 20px;
+        display: flex;
+        justify-content: flex-end;
+      }
+      .switch {
+        position: relative;
+        display: inline-block;
+        width: 60px;
+        height: 34px;
+      }
+      .switch input {
+        opacity: 0;
+        width: 0;
+        height: 0;
+      }
+      .slider {
+        position: absolute;
+        cursor: pointer;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: #ccc;
+        transition: 0.4s;
+        border-radius: 34px;
+      }
+      .slider:before {
+        position: absolute;
+        content: "";
+        height: 26px;
+        width: 26px;
+        left: 4px;
+        bottom: 4px;
+        background-color: white;
+        transition: 0.4s;
+        border-radius: 50%;
+      }
+      input:checked + .slider {
+        background-color: #bb86fc;
+      }
+      input:checked + .slider:before {
+        transform: translateX(26px);
+      }
+    </style>
+  </head>
+  <body class="light-theme">
+    <div class="container">
+      <div class="theme-toggle">
+        <label class="switch">
+          <input type="checkbox" id="themeToggle" />
+          <span class="slider"></span>
+        </label>
+      </div>
+      <div class="columns">
+        <div class="column">
+          <h2>To Do</h2>
+          <input type="text" id="todoInput" placeholder="Add a new task..." />
+          <button onclick="addTask('todo')">Add Task</button>
+          <ul id="todoList"></ul>
+        </div>
+        <div class="column">
+          <h2>In Progress</h2>
+          <ul id="inProgressList"></ul>
+        </div>
+        <div class="column">
+          <h2>Done</h2>
+          <ul id="doneList"></ul>
+        </div>
+      </div>
+    </div>
+
+    <script>
+      function addTask(listId) {
+        const input = document.getElementById("todoInput");
+        const list = document.getElementById(listId + "List");
+        if (input.value !== "") {
+          const li = document.createElement("li");
+          li.textContent = input.value;
+          li.draggable = true;
+          li.addEventListener("dragstart", drag);
+          list.appendChild(li);
+          input.value = "";
+        }
+      }
+
+      function drag(ev) {
+        ev.dataTransfer.setData("text", ev.target.textContent);
+      }
+
+      function allowDrop(ev) {
+        ev.preventDefault();
+      }
+
+      function drop(ev) {
+        ev.preventDefault();
+        const data = ev.dataTransfer.getData("text");
+        const li = document.createElement("li");
+        li.textContent = data;
+        li.draggable = true;
+        li.addEventListener("dragstart", drag);
+        ev.target.closest(".column").querySelector("ul").appendChild(li);
+      }
+
+      document.querySelectorAll(".column").forEach((column) => {
+        column.addEventListener("dragover", allowDrop);
+        column.addEventListener("drop", drop);
+      });
+
+      // Theme toggle functionality
+      const themeToggle = document.getElementById("themeToggle");
+      themeToggle.addEventListener("change", function () {
+        document.body.classList.toggle("dark-theme");
+        document.body.classList.toggle("light-theme");
+      });
+    </script>
+  </body>
+</html>
